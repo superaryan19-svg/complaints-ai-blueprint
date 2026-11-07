@@ -1,0 +1,28 @@
+# Environments & Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# Large raw datasets (CFPB raw download is >1GB; do not push to GitHub)
+01_A1_diagnostic/data/raw/*.csv
+01_A1_diagnostic/data/raw/*.zip
+data/raw/
+
+# Office temporary lock files
+~$*.xlsx
+~$*.docx
+~$*.pptx
+
+# Large media files
+*.mp4
+*.zip
+*.tar.gz
+
+# System files
+.DS_Store
+Thumbs.db
+Desktop.ini
