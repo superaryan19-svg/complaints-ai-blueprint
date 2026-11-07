@@ -1,0 +1,6 @@
+metric,baseline,target,source
+Avg handle time (min),25.0,19.0,Assumption (interviews)
+Complaints per month,40000.0,40000.0,Assumption (A2 input)
+Loaded agent cost (INR/hr),400.0,400.0,Assumption (A2 input)
+Resolved within 30 days (%),88.0,95.0,Assumption (A1 timely rate as proxy)
+Escalated to Ombudsman (%),3.0,2.55,Assumption (A2 input)

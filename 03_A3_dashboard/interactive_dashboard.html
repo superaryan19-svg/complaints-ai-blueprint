@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kestrel Bank — AI Value Dashboard (Power BI Preview)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #202124;
+            --text-muted: #5f6368;
+            --border-color: #dadce0;
+            --primary-navy: #1a365d;
+            --accent-blue: #2563eb;
+            --green: #16a34a;
+            --orange: #ea580c;
+            --red: #dc2626;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 18px 24px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .title h1 { font-size: 20px; color: var(--primary-navy); font-weight: 700; }
+        .title p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+        .badge { background: #e0e7ff; color: #3730a3; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+
+        /* Navigation Tabs */
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 18px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: var(--primary-navy); color: #ffffff; border-color: var(--primary-navy); }
+        .tab-btn:hover:not(.active) { background: #e5e7eb; color: var(--text-main); }
+
+        /* KPI Cards Grid */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .kpi-card { background: var(--card-bg); padding: 18px 20px; border-radius: 8px; border: 1px solid var(--border-color); position: relative; }
+        .kpi-card .label { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; }
+        .kpi-card .value { font-size: 26px; font-weight: 700; color: var(--text-main); margin-top: 6px; }
+        .kpi-card .subtext { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+        /* Charts Layout */
+        .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+        .chart-card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .chart-card h3 { font-size: 14px; font-weight: 700; color: var(--primary-navy); margin-bottom: 14px; }
+
+        /* Footnote */
+        .footnote { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 12px 16px; border-radius: 6px; font-size: 12px; line-height: 1.5; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="title">
+            <h1>Kestrel Bank — AI Telemetry & Value Realisation Dashboard</h1>
+            <p>Phase 2 Pilot Evaluation (90 Days | 120 Agents | 64,588 Runs)</p>
+        </div>
+        <div>
+            <span class="badge">Power BI Model Preview</span>
+        </div>
+    </div>
+
+    <!-- 4 Persona Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('cfo')">1. Executive (CFO): "Is it paying for itself?"</button>
+        <button class="tab-btn" onclick="switchTab('coo')">2. Operations (COO): "Is it making the team faster?"</button>
+        <button class="tab-btn" onclick="switchTab('cro')">3. Risk & Compliance: "Is it safe?"</button>
+        <button class="tab-btn" onclick="switchTab('sponsor')">4. Sponsor: "Are people using it?"</button>
+    </div>
+
+    <!-- VIEW 1: CFO -->
+    <div id="view-cfo">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="label">Total AI Token Cost</div>
+                <div class="value">₹45,017</div>
+                <div class="subtext">$511.56 USD @ ₹88/USD</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Realised Labour Value</div>
+                <div class="value">₹6.74 lakh</div>
+                <div class="subtext">3,370 hrs @ ₹400/hr (50% real.)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Net Pilot Value</div>
+                <div class="value" style="color: var(--green);">₹6.29 lakh</div>
+                <div class="subtext">Realised Value - Token Costs</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">AI Cost Per Run</div>
+                <div class="value">₹0.70</div>
+                <div class="subtext">Across 64,588 AI calls</div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>Cumulative Net Value Realised (₹ INR by Day)</h3>
+                <canvas id="cfoLineChart" height="110"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Model Cost by Use Case (₹ INR)</h3>
+                <canvas id="cfoBarChart" height="230"></canvas>
+            </div>
+        </div>
+
+        <div class="footnote">
+            <strong>CFO Governance Note:</strong> Net value reflects marginal model usage vs. realized agent labor hours. Upfront build capex (₹86L) and annual run engineering (₹40L) are tracked separately in the A2 Business Case.
+        </div>
+    </div>
+
+    <!-- VIEW 2: COO -->
+    <div id="view-coo" class="hidden">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="label">Net Hours Saved</div>
+                <div class="value">3,370 hrs</div>
+                <div class="subtext">Capacity reclaimed across 4 teams</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Daily AI Volume</div>
+                <div class="value">718 runs/day</div>
+                <div class="subtext">Active operational velocity</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Agent Acceptance Rate</div>
+                <div class="value" style="color: var(--green);">89.7%</div>
+                <div class="subtext">Accepted as-is or lightly edited</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Human Escalation Rate</div>
+                <div class="value">6.0%</div>
+                <div class="subtext">Handled by team lead / supervisor</div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>Hours Saved by Week Start</h3>
+                <canvas id="cooColChart" height="110"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Acceptance Rate by Department (Target: 80%)</h3>
+                <canvas id="cooBarChart" height="230"></canvas>
+            </div>
+        </div>
+
+        <div class="footnote">
+            <strong>Operations Benchmark:</strong> Average Handle Time (AHT) trending down from 25.0 min baseline toward 19.0 min target. Intake routing lag remains at 0.0 days.
+        </div>
+    </div>
+
+    <!-- VIEW 3: CRO -->
+    <div id="view-cro" class="hidden">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="label">Agent Override Rate</div>
+                <div class="value">10.3%</div>
+                <div class="subtext">Threshold ceiling: &le; 15%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Guardrail Flag Rate</div>
+                <div class="value">3.4%</div>
+                <div class="subtext">PII, low confidence & policy alerts</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Automated PII Blocks</div>
+                <div class="value" style="color: var(--accent-blue);">944</div>
+                <div class="subtext">Masked before LLM processing</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">P95 Response Latency</div>
+                <div class="value">2.89 s</div>
+                <div class="subtext">Target: &lt; 5.0s for RAG answers</div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>Weekly Override Rate Trend vs. 15% Governance Ceiling</h3>
+                <canvas id="croLineChart" height="110"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Guardrail Incidents Breakdown</h3>
+                <canvas id="croPieChart" height="230"></canvas>
+            </div>
+        </div>
+
+        <div class="footnote">
+            <strong>Risk & DPDP Guardrails:</strong> Zero unmasked PII leaks detected. Agent override rates have stabilized under 11%, well within the 15% risk policy requirement.
+        </div>
+    </div>
+
+    <!-- VIEW 4: SPONSOR -->
+    <div id="view-sponsor" class="hidden">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="label">Active Agents</div>
+                <div class="value">120</div>
+                <div class="subtext">Ramped from 52 to 120 agents</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Cohort Adoption %</div>
+                <div class="value" style="color: var(--green);">100%</div>
+                <div class="subtext">120 of 120 pilot agents active</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Average Runs / Agent</div>
+                <div class="value">538 runs</div>
+                <div class="subtext">Over 90-day pilot duration</div>
+            </div>
+            <div class="kpi-card">
+                <div class="label">Active Business Units</div>
+                <div class="value">4 of 4</div>
+                <div class="subtext">Cards, CASA, Digital, Branch</div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>Agent Adoption Ramp (Active Weekly Users)</h3>
+                <canvas id="sponsorLineChart" height="110"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>AI Usage Share by Use Case</h3>
+                <canvas id="sponsorDonutChart" height="230"></canvas>
+            </div>
+        </div>
+
+        <div class="footnote">
+            <strong>Change Management Update:</strong> 100% cohort activation reached by Week 8. Weekly 15-minute feedback huddles have reduced draft rewrite rates by 35%.
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            ['cfo', 'coo', 'cro', 'sponsor'].forEach(id => {
+                document.getElementById('view-' + id).classList.add('hidden');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+
+        // Initialize Charts
+        window.onload = function() {
+            // CFO Line Chart
+            new Chart(document.getElementById('cfoLineChart'), {
+                type: 'line',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12', 'W13'],
+                    datasets: [{
+                        label: 'Cumulative Net Value (₹)',
+                        data: [15000, 42000, 85000, 142000, 215000, 298000, 375000, 442000, 505000, 558000, 595000, 618000, 629000],
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // CFO Bar Chart
+            new Chart(document.getElementById('cfoBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Triage & Route', 'Draft Reply', 'Policy Q&A'],
+                    datasets: [{
+                        label: 'Cost (₹)',
+                        data: [2500, 24500, 18017],
+                        backgroundColor: ['#93c5fd', '#3b82f6', '#1d4ed8']
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // COO Column Chart
+            new Chart(document.getElementById('cooColChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12', 'W13'],
+                    datasets: [{
+                        label: 'Weekly Hours Saved',
+                        data: [95, 140, 195, 260, 310, 335, 340, 350, 345, 330, 335, 325, 310],
+                        backgroundColor: '#2563eb'
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // COO Bar Chart
+            new Chart(document.getElementById('cooBarChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Cards', 'CASA', 'Digital', 'Branch Esc.'],
+                    datasets: [{
+                        label: 'Acceptance Rate (%)',
+                        data: [91.2, 89.5, 88.8, 89.1],
+                        backgroundColor: '#10b981'
+                    }]
+                },
+                options: { responsive: true, scales: { y: { min: 70, max: 100 } } }
+            });
+
+            // CRO Line Chart
+            new Chart(document.getElementById('croLineChart'), {
+                type: 'line',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12', 'W13'],
+                    datasets: [
+                        {
+                            label: 'Override Rate (%)',
+                            data: [14.2, 13.5, 12.1, 11.4, 10.8, 10.5, 10.2, 10.1, 9.8, 9.9, 10.0, 10.1, 10.3],
+                            borderColor: '#ea580c',
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Risk Ceiling (15%)',
+                            data: [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
+                            borderColor: '#dc2626',
+                            borderDash: [5, 5],
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: { responsive: true, scales: { y: { min: 5, max: 20 } } }
+            });
+
+            // CRO Pie Chart
+            new Chart(document.getElementById('croPieChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['No Flag (96.6%)', 'PII Redacted (1.5%)', 'Low Conf. (1.5%)', 'Off-Policy (0.5%)'],
+                    datasets: [{
+                        data: [96.6, 1.5, 1.5, 0.5],
+                        backgroundColor: ['#e5e7eb', '#3b82f6', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // Sponsor Line Chart
+            new Chart(document.getElementById('sponsorLineChart'), {
+                type: 'line',
+                data: {
+                    labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12', 'W13'],
+                    datasets: [{
+                        label: 'Active Agents',
+                        data: [52, 64, 78, 92, 105, 115, 118, 120, 120, 120, 120, 120, 120],
+                        borderColor: '#4f46e5',
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, scales: { y: { min: 40, max: 130 } } }
+            });
+
+            // Sponsor Donut Chart
+            new Chart(document.getElementById('sponsorDonutChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Triage & Routing (45%)', 'Draft Reply (35%)', 'Policy Q&A (20%)'],
+                    datasets: [{
+                        data: [45, 35, 20],
+                        backgroundColor: ['#60a5fa', '#3b82f6', '#1d4ed8']
+                    }]
+                },
+                options: { responsive: true }
+            });
+        };
+    </script>
+</body>
+</html>
